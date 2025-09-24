@@ -1,0 +1,72 @@
+package com.llm_project.user_service.auth.service.Impl;
+
+import com.llm_project.user_service.auth.entity.Otp;
+import com.llm_project.user_service.auth.repository.OtpRepository;
+import com.llm_project.user_service.auth.service.OtpService;
+import com.llm_project.user_service.common.utils.OTPUtils;
+import com.llm_project.user_service.user.entity.User;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.ZonedDateTime;
+import java.util.Optional;
+
+public class OtpServiceImpl implements OtpService {
+
+  OtpRepository otpRepository;
+
+  OTPUtils otpUtils;
+
+  PasswordEncoder passwordEncoder;
+
+  @Transactional
+  public void sendOtp(User user){
+
+    otpRepository.deleteByUserIdAndIsUsedFalse(user.getId());
+
+    String rawOtp = otpUtils.generateOtp();
+    String encodedOtp = passwordEncoder.encode(rawOtp);
+
+    Otp otp = Otp.builder()
+        .otpUserId(user.getId())
+        .code(encodedOtp)
+        .isUsed(false)
+        .expireDate(ZonedDateTime.now().plusMinutes(5))
+        .build();
+
+    otpRepository.save(otp);
+
+    //TODO: Send OTP to user via email
+  }
+
+  @Transactional
+  public boolean verifyOtp(User user, String inputOtp){
+    Optional<Otp> otpOpt =
+        otpRepository.findTopByUserIdAndIsUsedFalseOrderByExpiryDateDesc(user.getId());
+
+    if (otpOpt.isEmpty()) return false;
+
+    Otp otp = otpOpt.get();
+
+    if (otp.getExpireDate().isBefore(ZonedDateTime.now())) {
+      otp.setIsUsed(true);
+      otpRepository.save(otp);
+      return false;
+    }
+
+    if (passwordEncoder.matches(inputOtp, otp.getCode())) {
+      otp.setIsUsed(true);
+      otpRepository.save(otp);
+      return true;
+    }
+
+    return false;
+  }
+
+  @Scheduled(cron = "0 0 * * * *")
+  @Transactional
+  public void cleanupExpiredOtps() {
+    otpRepository.deleteExpired(ZonedDateTime.now());
+  }
+}

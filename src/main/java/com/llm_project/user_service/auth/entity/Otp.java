@@ -30,14 +30,9 @@ public class Otp implements Serializable {
   private String otpUserId;
 
   @JsonIgnore
-  @Column(name = "create_dt")
+  @Column(name = "expire_dt")
   @CreationTimestamp
-  private ZonedDateTime createDate;
-
-  @JsonIgnore
-  @Column(name = "update_dt")
-  @UpdateTimestamp
-  private ZonedDateTime updateDate;
+  private ZonedDateTime expireDate;
 
   @Builder.Default
   @Column(name = "is_used", columnDefinition = "boolean default FALSE")
