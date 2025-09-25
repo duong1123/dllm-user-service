@@ -1,10 +1,74 @@
 package com.llm_project.user_service.auth.service;
 
+import com.llm_project.user_service.auth.entity.Otp;
+import com.llm_project.user_service.auth.repository.OtpRepository;
+import com.llm_project.user_service.common.utils.OTPUtils;
+import com.llm_project.user_service.email.service.EmailService;
 import com.llm_project.user_service.user.entity.User;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface OtpService {
+import java.time.ZonedDateTime;
+import java.util.Optional;
 
-  public void sendOtp(User user);
+public class OtpService {
 
-  public boolean verifyOtp(User user, String inputOtp);
+  OtpRepository otpRepository;
+
+  OTPUtils otpUtils;
+
+  PasswordEncoder passwordEncoder;
+
+  EmailService emailService;
+
+  @Transactional
+  public void sendOtp(User user){
+
+    otpRepository.deleteByUserIdAndIsUsedFalse(user.getId());
+
+    String rawOtp = otpUtils.generateOtp();
+    String encodedOtp = passwordEncoder.encode(rawOtp);
+
+    Otp otp = Otp.builder()
+        .otpUserId(user.getId())
+        .code(encodedOtp)
+        .isUsed(false)
+        .expireDate(ZonedDateTime.now().plusMinutes(5))
+        .build();
+
+    otpRepository.save(otp);
+
+    emailService.sendOtpEmail(user.getEmail(), rawOtp);
+  }
+
+  @Transactional
+  public boolean verifyOtp(User user, String inputOtp){
+    Optional<Otp> otpOpt =
+        otpRepository.findTopByUserIdAndIsUsedFalseOrderByExpiryDateDesc(user.getId());
+
+    if (otpOpt.isEmpty()) return false;
+
+    Otp otp = otpOpt.get();
+
+    if (otp.getExpireDate().isBefore(ZonedDateTime.now())) {
+      otp.setIsUsed(true);
+      otpRepository.save(otp);
+      return false;
+    }
+
+    if (passwordEncoder.matches(inputOtp, otp.getCode())) {
+      otp.setIsUsed(true);
+      otpRepository.save(otp);
+      return true;
+    }
+
+    return false;
+  }
+
+  @Scheduled(cron = "0 0 * * * *")
+  @Transactional
+  public void cleanupExpiredOtps() {
+    otpRepository.deleteExpired(ZonedDateTime.now());
+  }
 }
