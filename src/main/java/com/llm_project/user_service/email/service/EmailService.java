@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,14 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class EmailService {
 
-  JavaMailSender javaMailSender;
-  Configuration freemarkerConfig;
+  private final JavaMailSender javaMailSender;
+  private final Configuration freemarkerConfig;
+
+  @Value("${email.from}")
+  String emailSys;
 
   private void sendEmail(EmailDetailsRequest request, String path, Map<String, Object> model) {
     try {
@@ -58,7 +61,7 @@ public class EmailService {
 
   public void sendOtpEmail(String toEmail, String otpCode) {
     EmailDetailsRequest request = new EmailDetailsRequest();
-    request.setFromEmail("noreply@yourapp.com");
+    request.setFromEmail(emailSys);
     request.setToEmail(toEmail);
     request.setSubject("Your OTP Code");
 
