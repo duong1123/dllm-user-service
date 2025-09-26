@@ -3,7 +3,6 @@ package com.llm_project.user_service.user.entity;
 import com.llm_project.user_service.common.constants.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -31,9 +30,6 @@ public class User {
 
   @Column(name = "password_hash", length = 256, nullable = false)
   private String passwordHash;
-
-  @Column(name = "is_verified")
-  private boolean isVerified;
 
   @Column(name = "status")
   private UserStatus status;

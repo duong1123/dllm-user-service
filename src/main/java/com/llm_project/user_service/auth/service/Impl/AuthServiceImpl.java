@@ -1,11 +1,16 @@
 package com.llm_project.user_service.auth.service.Impl;
 
 import com.llm_project.user_service.auth.payload.request.LoginRequest;
+import com.llm_project.user_service.auth.payload.request.OtpVerifyRequest;
+import com.llm_project.user_service.auth.payload.request.SendOTPRequest;
 import com.llm_project.user_service.auth.payload.response.LoginResponse;
 import com.llm_project.user_service.auth.service.AuthService;
+import com.llm_project.user_service.auth.service.OtpService;
+import com.llm_project.user_service.common.constants.enums.UserStatus;
 import com.llm_project.user_service.common.payload.response.ErrorResponse;
 import com.llm_project.user_service.common.security.JwtUtils;
 import com.llm_project.user_service.common.security.service.UserDetailsImpl;
+import com.llm_project.user_service.user.entity.User;
 import com.llm_project.user_service.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,11 +35,13 @@ public class AuthServiceImpl implements AuthService {
 
   AuthenticationManager authenticationManager;
 
+  OtpService otpService;
+
   public ResponseEntity<Object> login(LoginRequest loginRequest){
     String username = loginRequest.getUsername();
     String password = loginRequest.getPassword();
 
-    Authentication authentication = null;
+    Authentication authentication;
 
     var user = userRepository.getUserByUsername(username);
 
@@ -61,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
           );
     }
 
-    UserDetailsImpl userDetails = null;
+    UserDetailsImpl userDetails;
     userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
     ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
@@ -77,4 +84,33 @@ public class AuthServiceImpl implements AuthService {
             .build());
   }
 
+  public ResponseEntity<Object> sendActiveOTP(SendOTPRequest request){
+    String username = request.getUsername();
+    User user = userRepository.getUserByUsername(username);
+
+    otpService.sendOtp(user);
+    return ResponseEntity.ok().build();
+  }
+
+  public ResponseEntity<Object> activeAccountOTP(OtpVerifyRequest request){
+    String username = request.getUsername();
+    String otp = request.getOtp();
+
+    User user = userRepository.getUserByUsername(username);
+    boolean isValid = otpService.verifyOtp(user, otp);
+
+    if (!isValid) {
+      return ResponseEntity
+          .status(HttpStatus.BAD_REQUEST)
+          .body(
+              ErrorResponse.builder()
+                  .code("INVALID_OTP")
+                  .build()
+          );
+    }
+
+    user.setStatus(UserStatus.ACTIVE);
+    userRepository.save(user);
+    return ResponseEntity.ok().build();
+  }
 }

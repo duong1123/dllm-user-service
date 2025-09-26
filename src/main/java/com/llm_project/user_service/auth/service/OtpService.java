@@ -5,13 +5,20 @@ import com.llm_project.user_service.auth.repository.OtpRepository;
 import com.llm_project.user_service.common.utils.OTPUtils;
 import com.llm_project.user_service.email.service.EmailService;
 import com.llm_project.user_service.user.entity.User;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OtpService {
 
   OtpRepository otpRepository;
@@ -25,7 +32,7 @@ public class OtpService {
   @Transactional
   public void sendOtp(User user){
 
-    otpRepository.deleteByUserIdAndIsUsedFalse(user.getId());
+    otpRepository.deleteByOtpUserIdAndIsUsedFalse(user.getId());
 
     String rawOtp = otpUtils.generateOtp();
     String encodedOtp = passwordEncoder.encode(rawOtp);
@@ -45,7 +52,7 @@ public class OtpService {
   @Transactional
   public boolean verifyOtp(User user, String inputOtp){
     Optional<Otp> otpOpt =
-        otpRepository.findTopByUserIdAndIsUsedFalseOrderByExpiryDateDesc(user.getId());
+        otpRepository.findTopByOtpUserIdAndIsUsedFalseOrderByExpireDateDesc(user.getId());
 
     if (otpOpt.isEmpty()) return false;
 
