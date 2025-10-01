@@ -41,7 +41,6 @@ public class UserServiceImpl implements UserService {
 
     User user = userMapper.toUser(request);
     user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-    user.setVerified(false);
     user.setStatus(UserStatus.PENDING);
 
     userRepository.save(user);

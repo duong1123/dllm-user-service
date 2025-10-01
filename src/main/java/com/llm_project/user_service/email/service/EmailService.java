@@ -6,9 +6,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -68,7 +66,7 @@ public class EmailService {
     Map<String, Object> model = new HashMap<>();
     model.put("otp", otpCode);
 
-    sendEmail(request, "otp-template.ftl", model);
+    sendEmail(request, "emails/otp.ftl", model);
   }
 
 }

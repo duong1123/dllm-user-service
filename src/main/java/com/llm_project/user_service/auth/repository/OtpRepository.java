@@ -6,16 +6,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 
 public interface OtpRepository extends JpaRepository<Otp, Long> {
 
-  void deleteByUserIdAndIsUsedFalse(String userId);
+  void deleteByOtpUserIdAndIsUsedFalse(String userId);
 
-  Optional<Otp> findTopByUserIdAndIsUsedFalseOrderByExpiryDateDesc(String userId);
+  Optional<Otp> findTopByOtpUserIdAndIsUsedFalseOrderByExpireDateDesc(String userId);
 
   @Modifying
   @Query(value = "DELETE FROM Otp o WHERE o.expire_dt < :now", nativeQuery = true)

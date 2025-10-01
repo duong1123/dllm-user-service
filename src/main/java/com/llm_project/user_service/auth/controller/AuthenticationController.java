@@ -1,8 +1,9 @@
 package com.llm_project.user_service.auth.controller;
 
 import com.llm_project.user_service.auth.payload.request.LoginRequest;
+import com.llm_project.user_service.auth.payload.request.OtpVerifyRequest;
+import com.llm_project.user_service.auth.payload.request.SendOTPRequest;
 import com.llm_project.user_service.auth.service.AuthService;
-import com.llm_project.user_service.auth.service.Impl.AuthServiceImpl;
 import com.llm_project.user_service.user.entity.User;
 import com.llm_project.user_service.user.payload.requests.UserCreationRequest;
 import com.llm_project.user_service.user.service.UserService;
@@ -38,5 +39,15 @@ public class AuthenticationController {
   @PostMapping("/login")
   ResponseEntity<Object> login(@RequestBody @Valid LoginRequest request) {
     return authService.login(request);
+  }
+
+  @PostMapping("/send-active-otp")
+  ResponseEntity<Object> sendActiveOtp(@RequestBody @Valid SendOTPRequest request) {
+    return authService.sendActiveOTP(request);
+  }
+
+  @PostMapping("/active-account-otp")
+  ResponseEntity<Object> activeAccountOTP(@RequestBody @Valid OtpVerifyRequest request) {
+    return authService.activeAccountOTP(request);
   }
 }
