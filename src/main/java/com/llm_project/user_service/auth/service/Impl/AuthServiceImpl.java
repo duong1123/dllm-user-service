@@ -129,7 +129,6 @@ public class AuthServiceImpl implements AuthService {
     String refreshToken = refreshTokenRequest.getRefreshToken();
 
     Authentication authentication;
-    UserDetailsImpl userDetails;
     String username;
     String roles;
 
@@ -207,7 +206,17 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public ResponseEntity<?> logout() {
-    return null;
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    User user = userRepository.getUserByUsername(username);
+    Session session = sessionRepository.findByUserId(user.getId());
+
+    if (session != null) {
+      sessionRepository.delete(session);
+    }
+    return ResponseEntity.ok()
+        .headers(jwtUtils.HttpHeadersClearCookie())
+        .body("");
   }
 
   public ResponseEntity<?> sendActiveOTP(SendOTPRequest request){

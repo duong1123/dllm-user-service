@@ -56,4 +56,9 @@ public class AuthenticationController {
   ResponseEntity<?> activeAccountOTP(@RequestBody @Valid OtpVerifyRequest request) {
     return authService.activeAccountOTP(request);
   }
+
+  @PostMapping("/logout")
+  ResponseEntity<?> logout() {
+    return authService.logout();
+  }
 }

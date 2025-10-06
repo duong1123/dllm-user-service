@@ -1,7 +1,6 @@
 package com.llm_project.user_service.common.security;
 
 import com.llm_project.user_service.common.security.service.UserDetailsImpl;
-import com.llm_project.user_service.user.repository.UserRoleRepository;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
@@ -10,6 +9,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -89,5 +89,16 @@ public class JwtUtils {
         .httpOnly(true)
         .secure(true)
         .build();
+  }
+
+  public HttpHeaders HttpHeadersClearCookie() {
+    ResponseCookie responseCookieClear = ResponseCookie.from("token",  "").path("/").maxAge(0)
+        .httpOnly(true)
+        .secure(true)
+        .build();
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.add(HttpHeaders.SET_COOKIE, responseCookieClear.toString());
+    return headers;
   }
 }
