@@ -45,6 +45,8 @@
 		<springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
 		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
 		<jjwt.version>0.12.6</jjwt.version>
+		<!-- https://mvnrepository.com/artifact/io.hypersistence/hypersistence-utils-hibernate-63 -->
+		<hypersistence-utils-hibernate-63.version>3.9.0</hypersistence-utils-hibernate-63.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -140,6 +142,13 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>${springdoc-openapi-ui.version}</version>
+		</dependency>
+
+		<!-- Hypersistence-utils-->
+		<dependency>
+			<groupId>io.hypersistence</groupId>
+			<artifactId>hypersistence-utils-hibernate-63</artifactId>
+			<version>${hypersistence-utils-hibernate-63.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
