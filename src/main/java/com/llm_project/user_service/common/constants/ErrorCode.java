@@ -9,4 +9,8 @@ public class ErrorCode {
     String USERNAME_EXISTED = "This username is already taken.";
   }
 
+  public interface AUTHENTICATION{
+    String INVALID_ACCESS_TOKEN = "Invalid access token.";
+    String INVALID_REFRESH_TOKEN = "Invalid refresh token.";
+  }
 }

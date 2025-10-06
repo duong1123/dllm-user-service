@@ -31,13 +31,29 @@ public class JwtUtils {
   @Value("${jwt.refresh.token.expiration.ms}")
   private int jwtRefreshTokenExpirationMs;
 
-  public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal){
+
+  public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal, boolean isRefreshToken){
     String jwt = generateTokenFromUsernameAndRole(userPrincipal.getUsername(),
-        userPrincipal.getAuthorities());
+        userPrincipal.getAuthorities(),
+        isRefreshToken);
     return responseCookieFrom(jwt);
   }
 
-  private String generateTokenFromUsernameAndRole(String username, Collection<? extends GrantedAuthority> authorities){
+  public ResponseCookie generateJwtCookie(String username, Collection<? extends GrantedAuthority> roles, boolean isRefreshToken){
+    String jwt = generateTokenFromUsernameAndRole(username,
+        roles,
+        isRefreshToken);
+    return responseCookieFrom(jwt);
+  }
+
+  public String generateTokenFromUsernameAndRole(String username,
+                                                  Collection<? extends GrantedAuthority> authorities,
+                                                  boolean isRefreshToken) {
+
+    int tokenExpirationMs = jwtExpirationMs;
+
+    if(isRefreshToken)
+      tokenExpirationMs = jwtRefreshTokenExpirationMs;
 
     JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -46,7 +62,7 @@ public class JwtUtils {
         .claim("username", username)
         .claim("roles", buildRoles(authorities))
         .issueTime(new Date())
-        .expirationTime(new Date((new Date()).getTime() + jwtExpirationMs))
+        .expirationTime(new Date((new Date()).getTime() + tokenExpirationMs))
         .build();
 
     Payload payload = new Payload(jwtClaimsSet.toJSONObject());
