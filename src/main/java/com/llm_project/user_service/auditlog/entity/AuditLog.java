@@ -27,6 +27,18 @@ public class AuditLog {
   @Column(name = "log_type")
   String logType;
 
+  @Column(name = "user_id")
+  String userId;
+
+  @Column(name = "ip_addr")
+  String ipAddr;
+
+  @Column(name = "ip_country")
+  String ipCountry;
+
+  @Column(name = "ip_city")
+  String ipCity;
+
   @CreationTimestamp
   @Column(name = "log_dt")
   ZonedDateTime logDt;

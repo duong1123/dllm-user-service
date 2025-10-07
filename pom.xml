@@ -47,6 +47,8 @@
 		<jjwt.version>0.12.6</jjwt.version>
 		<!-- https://mvnrepository.com/artifact/io.hypersistence/hypersistence-utils-hibernate-63 -->
 		<hypersistence-utils-hibernate-63.version>3.9.0</hypersistence-utils-hibernate-63.version>
+		<!-- https://mvnrepository.com/artifact/com.maxmind.geoip2/geoip2	-->
+		<geoip2.version>4.2.1</geoip2.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -149,6 +151,12 @@
 			<groupId>io.hypersistence</groupId>
 			<artifactId>hypersistence-utils-hibernate-63</artifactId>
 			<version>${hypersistence-utils-hibernate-63.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.maxmind.geoip2</groupId>
+			<artifactId>geoip2</artifactId>
+			<version>${geoip2.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
