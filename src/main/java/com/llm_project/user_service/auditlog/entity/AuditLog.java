@@ -49,7 +49,7 @@ public class AuditLog {
   @Column(name = "action")
   String action;
 
-  @Column(name = "log_details")
+  @Column(name = "log_details", columnDefinition = "jsonb")
   @Type(JsonBinaryType.class)
   Map<String, Object> logDetails;
 }
