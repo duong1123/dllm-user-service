@@ -26,10 +26,14 @@ public class Session {
   @Column(name = "user_id")
   String userId;
 
-  @Column(name = "access_token")
+  @Column(
+      name = "access_token",
+      columnDefinition = "VARCHAR(1024)")
   String accessToken;
 
-  @Column(name = "refresh_token")
+  @Column(
+      name = "refresh_token",
+      columnDefinition = "VARCHAR(1024)")
   String refreshToken;
 
   @Column(name = "create_dt")
