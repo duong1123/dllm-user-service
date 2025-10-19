@@ -1,15 +1,18 @@
 package com.llm_project.user_service.user.mapper;
 
 import com.llm_project.user_service.user.entity.User;
+import com.llm_project.user_service.user.payload.requests.ClientInfoUpdateRequest;
 import com.llm_project.user_service.user.payload.requests.UserCreationRequest;
-import com.llm_project.user_service.user.payload.responses.MyInfoResponse;
+import com.llm_project.user_service.user.payload.responses.UserInfoResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-  User toUser(UserCreationRequest request);
+  User toUserFromCreationRequest(UserCreationRequest request);
 
-  MyInfoResponse toMyInfoResponse(User user);
+  UserInfoResponse toUserInfoResponse(User user);
 
+  void toUserFromClientUpdateRequest(@MappingTarget User user , ClientInfoUpdateRequest request);
 }

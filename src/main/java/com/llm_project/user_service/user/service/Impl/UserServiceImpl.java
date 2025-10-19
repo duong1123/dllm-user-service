@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
       throw new ErrorException(HttpStatus.BAD_REQUEST, ErrorCode.USER.USERNAME_EXISTED);
     }
 
-    User user = userMapper.toUser(request);
+    User user = userMapper.toUserFromCreationRequest(request);
     user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
     user.setStatus(UserStatus.PENDING);
 
