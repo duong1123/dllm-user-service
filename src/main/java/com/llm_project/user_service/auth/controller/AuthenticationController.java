@@ -6,14 +6,12 @@ import com.llm_project.user_service.auth.payload.request.RefreshTokenRequest;
 import com.llm_project.user_service.auth.payload.request.SendOTPRequest;
 import com.llm_project.user_service.auth.service.AuthService;
 import com.llm_project.user_service.common.security.JwtUtils;
-import com.llm_project.user_service.user.entity.User;
 import com.llm_project.user_service.user.payload.requests.UserCreationRequest;
-import com.llm_project.user_service.user.service.UserService;
+import com.llm_project.user_service.user.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,18 +24,15 @@ import java.util.Base64;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
 
-  UserService userService;
+  ClientService clientService;
 
   AuthService authService;
 
   JwtUtils  jwtUtils;
 
   @PostMapping("/register")
-  ResponseEntity<Object> createUser(@RequestBody @Valid UserCreationRequest request) {
-    User createdUser = userService.createUser(request);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createdUser);
+  ResponseEntity<?> createUser(@RequestBody @Valid UserCreationRequest request) {
+    return clientService.createUser(request);
   }
 
   @PostMapping("/login")

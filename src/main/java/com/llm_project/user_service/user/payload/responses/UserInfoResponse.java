@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MyInfoResponse {
+public class UserInfoResponse {
   String username;
   String email;
   String fullName;
