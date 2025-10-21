@@ -21,7 +21,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -34,10 +33,8 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import io.jsonwebtoken.security.Keys;
 
-import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,9 +43,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class AuthServiceImpl implements AuthService {
-
-  @Value("${jwt.secret}")
-  String jwtSecret;
 
   final JwtUtils jwtUtils;
 
@@ -129,15 +123,18 @@ public class AuthServiceImpl implements AuthService {
     String refreshToken = refreshTokenRequest.getRefreshToken();
 
     Authentication authentication;
-    UserDetailsImpl userDetails;
     String username;
     String roles;
 
     try{
-      SecretKey key = Keys.hmacShaKeyFor(
-          jwtSecret.getBytes(StandardCharsets.UTF_8));
+      PublicKey publicKey = jwtUtils.getPublicKey();
 
-      Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(refreshToken).getPayload();
+      Claims claims = Jwts.parser()
+          .verifyWith(publicKey)
+          .build()
+          .parseSignedClaims(refreshToken)
+          .getPayload();
+
       username = String.valueOf(claims.get("username"));
       roles = (String) claims.get("roles");
       authentication = new UsernamePasswordAuthenticationToken(username, null,
@@ -207,7 +204,17 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public ResponseEntity<?> logout() {
-    return null;
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    User user = userRepository.getUserByUsername(username);
+    Session session = sessionRepository.findByUserId(user.getId());
+
+    if (session != null) {
+      sessionRepository.delete(session);
+    }
+    return ResponseEntity.ok()
+        .headers(jwtUtils.HttpHeadersClearCookie())
+        .body("");
   }
 
   public ResponseEntity<?> sendActiveOTP(SendOTPRequest request){

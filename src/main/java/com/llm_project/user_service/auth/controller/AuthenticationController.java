@@ -5,19 +5,18 @@ import com.llm_project.user_service.auth.payload.request.OtpVerifyRequest;
 import com.llm_project.user_service.auth.payload.request.RefreshTokenRequest;
 import com.llm_project.user_service.auth.payload.request.SendOTPRequest;
 import com.llm_project.user_service.auth.service.AuthService;
-import com.llm_project.user_service.user.entity.User;
+import com.llm_project.user_service.common.security.JwtUtils;
 import com.llm_project.user_service.user.payload.requests.UserCreationRequest;
-import com.llm_project.user_service.user.service.UserService;
+import com.llm_project.user_service.user.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.PublicKey;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/auth")
@@ -25,16 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
 
-  UserService userService;
+  ClientService clientService;
 
   AuthService authService;
 
+  JwtUtils  jwtUtils;
+
   @PostMapping("/register")
-  ResponseEntity<Object> createUser(@RequestBody @Valid UserCreationRequest request) {
-    User createdUser = userService.createUser(request);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createdUser);
+  ResponseEntity<?> createUser(@RequestBody @Valid UserCreationRequest request) {
+    return clientService.createUser(request);
   }
 
   @PostMapping("/login")
@@ -55,5 +53,17 @@ public class AuthenticationController {
   @PostMapping("/active-account-otp")
   ResponseEntity<?> activeAccountOTP(@RequestBody @Valid OtpVerifyRequest request) {
     return authService.activeAccountOTP(request);
+  }
+
+  @PostMapping("/logout")
+  ResponseEntity<?> logout() {
+    return authService.logout();
+  }
+
+  @GetMapping("/public-key")
+  public ResponseEntity<?> getPublicKey() {
+    PublicKey publicKey = jwtUtils.getPublicKey();
+    String encodedKey = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+    return ResponseEntity.ok(encodedKey);
   }
 }

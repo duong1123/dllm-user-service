@@ -7,6 +7,7 @@ public class ErrorCode {
 
   public interface USER{
     String USERNAME_EXISTED = "This username is already taken.";
+    String USER_NOT_FOUND = "User not found.";
   }
 
   public interface AUTHENTICATION{
