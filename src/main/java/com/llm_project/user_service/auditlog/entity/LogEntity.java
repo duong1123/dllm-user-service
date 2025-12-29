@@ -18,7 +18,7 @@ import java.util.Map;
 @Entity
 @Table  (name = "audit_log")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuditLog {
+public class LogEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,12 +32,6 @@ public class AuditLog {
 
   @Column(name = "ip_addr")
   String ipAddr;
-
-  @Column(name = "ip_country")
-  String ipCountry;
-
-  @Column(name = "ip_city")
-  String ipCity;
 
   @CreationTimestamp
   @Column(name = "log_dt")

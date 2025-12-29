@@ -1,7 +1,7 @@
 package com.llm_project.user_service.auditlog.service.impl;
 
 import com.llm_project.user_service.auditlog.dto.AuditLogDTO;
-import com.llm_project.user_service.auditlog.entity.AuditLog;
+import com.llm_project.user_service.auditlog.entity.LogEntity;
 import com.llm_project.user_service.auditlog.repository.AuditLogRepository;
 import com.llm_project.user_service.auditlog.service.AuditLogService;
 import com.llm_project.user_service.user.repository.UserRepository;
@@ -23,16 +23,14 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuditLogServiceImpl implements AuditLogService {
 
-  final UserRepository userRepository;
-
   final AuditLogRepository auditLogRepository;
 
   @Override
-  public AuditLog saveLog(String userId,String ipAddr, String module, String action, Object oldData, Object newData) {
+  public LogEntity saveLog(String userId, String ipAddr, String module, String action, Object oldData, Object newData) {
     try {
       String ip = getIpAddress();
 
-      AuditLog log = new AuditLog();
+      LogEntity log = new LogEntity();
       log.setUserId(userId);
       log.setModule(module);
       log.setAction(action);
